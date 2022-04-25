@@ -118,7 +118,7 @@
 -define:ENABLE_LEGACY_INPUT_MANAGER
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
--r:"F:/DeveloperKits/DevProject/UnityProj/Test/Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll"
+-r:"F:/DeveloperKits/DevProject/UnityProj/NormalGame/ANormalGame/MasterProj/Library/PackageCache/com.unity.ext.nunit@1.0.6/net35/unity-custom/nunit.framework.dll"
 -r:"F:/DeveloperKits/UnityEditors/Unity2021/Unity 2021.3.0f1c1/Editor/Data/Managed/UnityEditor.Graphs.dll"
 -r:"F:/DeveloperKits/UnityEditors/Unity2021/Unity 2021.3.0f1c1/Editor/Data/Managed/UnityEngine/UnityEditor.CoreModule.dll"
 -r:"F:/DeveloperKits/UnityEditors/Unity2021/Unity 2021.3.0f1c1/Editor/Data/Managed/UnityEngine/UnityEditor.DeviceSimulatorModule.dll"

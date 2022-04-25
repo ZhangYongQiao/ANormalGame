@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Timers;
 
 public class AssetBundleBuilder : EditorWindow
 {
@@ -23,34 +24,85 @@ public class AssetBundleBuilder : EditorWindow
     {
         thisWindow = EditorWindow.GetWindow<AssetBundleBuilder>();
         thisWindow.minSize = new Vector2(250, 300);
-        thisWindow.maxSize = new Vector2(250, 300);
         thisWindow.Show();
     }
 
-    bool atlas;
-    bool prefabs;
+    static bool atlas;
+    static bool prefabs;
 
 
     private void OnGUI()
     {
+        float toggleWidth = 20;
+        float baseWidth = thisWindow.minSize.x - 30;
+
         EditorGUILayout.BeginHorizontal();
 
-        atlas = EditorGUILayout.Toggle(atlas, GUILayout.Width(20));
-        if (GUILayout.Button("图集打包", GUILayout.Width(100)))
+        atlas = EditorGUILayout.Toggle(atlas, GUILayout.Width(toggleWidth));
+        if (GUILayout.Button("图集打包", GUILayout.Width(baseWidth)))
         {
             BuildAtlas();
         }
-
         EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space(30);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("全选", GUILayout.Width(100)))
+        {
+            atlas = true;
+            prefabs = true;
+            //Add
+        }
+        if (GUILayout.Button("全不选", GUILayout.Width(100)))
+        {
+            atlas = false;
+            prefabs = false;
+            //Add
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space(20);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("打包", GUILayout.Width(thisWindow.minSize.x), GUILayout.Height(50)))
+        {
+            BuildAtlas();
+            //Other...
+        }
+        EditorGUILayout.EndHorizontal();
+
     }
 
 
+    /// <summary> 图集打包 </summary>
     static void BuildAtlas()
     {
-        CheckPath(atlasPath,false);
+        if (!atlas) return;
 
+        CheckPath(atlasPath);
+        CheckPath(atlasOutputPath, true);
+        string[] guids = AssetDatabase.FindAssets("t:texture", new string[] { atlasPath });
+        if (guids == null || guids.Length <= 0)
+        {
+            Debug.LogError("未找到匹配资源 : texture");
+            return;
+        }
+        int len = guids.Length;
+        string[] paths = new string[len];
+
+        for (int i = 0; i < len; ++i)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+            if (path != null)
+            {
+                paths[i] = path;
+            }
+        }
+        AssetBundleBuild abb = new AssetBundleBuild();
+        abb.assetBundleName = "atlasab";
+        abb.assetNames = paths;
+        BuildPipeline.BuildAssetBundles(atlasOutputPath, new AssetBundleBuild[] { abb }, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.StandaloneWindows64);
+        AssetDatabase.Refresh();
     }
-
 
 
     /// <summary>
@@ -58,7 +110,7 @@ public class AssetBundleBuilder : EditorWindow
     /// </summary>
     /// <param name="path"></param>
     /// <param name="isOutputPath">如果不是输出路径，就需要报告，且不能删除该文件夹下任何资源</param>
-    static void CheckPath(string path,bool isOutputPath = false)
+    static void CheckPath(string path, bool isOutputPath = false)
     {
         if (!Directory.Exists(path))
         {
@@ -76,7 +128,7 @@ public class AssetBundleBuilder : EditorWindow
                 return;
             }
             string[] filePath = Directory.GetFiles(path);
-            if (filePath!=null && filePath.Length != 0)
+            if (filePath != null && filePath.Length != 0)
             {
                 int len = filePath.Length;
                 for (int i = 0; i < len; i++)
@@ -97,14 +149,13 @@ public class AssetBundleBuilder : EditorWindow
     }
 
 
-
     [MenuItem("Tools/PrintPath")]
     static void PrintPaths()
     {
-        Debug.Log(Application.dataPath);
-        Debug.Log(Application.streamingAssetsPath);
-        Debug.Log(Application.persistentDataPath);
-        Debug.Log(Application.consoleLogPath);
+        Debug.Log("dataPath : " + Application.dataPath);
+        Debug.Log("streamingAssetsPath : " + Application.streamingAssetsPath);
+        Debug.Log("persistentDataPath : " + Application.persistentDataPath);
+        Debug.Log("consoleLogPath : " + Application.consoleLogPath);
     }
 
 }

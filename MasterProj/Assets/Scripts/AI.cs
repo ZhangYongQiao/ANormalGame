@@ -16,7 +16,6 @@ public class AI : MonoBehaviour
     private void Awake()
     {
         SelfAnimator = GetComponent<Animator>();
-        StartCoroutine(DownLoadImg("https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_fe30c9d48d44a36f179a5c5c4b021026.jpeg?from=4010531038"));
     }
 
     public void SetBaseInfo(UserInfo userInfo)
@@ -26,8 +25,10 @@ public class AI : MonoBehaviour
             Debug.LogError("userInfo==null");
             return;  
         }
+        transform.name = "AI";
         _CurInfo = userInfo;
         Tools.RandomLocalPos(transform);
+        StartCoroutine(DownLoadImg("https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-avt-0015_fe30c9d48d44a36f179a5c5c4b021026.jpeg?from=4010531038"));
     }
 
     /// <summary>

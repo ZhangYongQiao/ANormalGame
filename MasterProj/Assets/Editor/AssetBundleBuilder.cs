@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Timers;
+using System;
 
 public class AssetBundleBuilder : EditorWindow
 {
@@ -45,6 +46,14 @@ public class AssetBundleBuilder : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+        prefabs = EditorGUILayout.Toggle(prefabs, GUILayout.Width(toggleWidth));
+        if (GUILayout.Button("预制体打包", GUILayout.Width(baseWidth)))
+        {
+            BuildPrefabs();
+        }
+        EditorGUILayout.EndHorizontal();
+
         EditorGUILayout.Space(30);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("全选", GUILayout.Width(100)))
@@ -66,21 +75,36 @@ public class AssetBundleBuilder : EditorWindow
         if (GUILayout.Button("打包", GUILayout.Width(thisWindow.minSize.x), GUILayout.Height(50)))
         {
             BuildAtlas();
+            BuildPrefabs();
             //Other...
+
         }
         EditorGUILayout.EndHorizontal();
 
     }
 
+    /// <summary>
+    /// 预制体打包
+    /// </summary>
+    static void BuildPrefabs()
+    {
+        if (!prefabs) return;
+        CheckPath(prefabsPath);
+        BuildPart("t:prefab", new string[] { prefabsPath }, "prefabsab", prefabsOutputPath);
+    }
 
     /// <summary> 图集打包 </summary>
     static void BuildAtlas()
     {
         if (!atlas) return;
-
         CheckPath(atlasPath);
-        CheckPath(atlasOutputPath, true);
-        string[] guids = AssetDatabase.FindAssets("t:texture", new string[] { atlasPath });
+        BuildPart("t:texture", new string[] { atlasPath }, "atlasab", atlasOutputPath);
+    }
+
+    static void BuildPart(string filter, string[] findPaths, string abName, string outputPath)
+    {
+        CheckPath(outputPath, true);
+        string[] guids = AssetDatabase.FindAssets(filter, findPaths);
         if (guids == null || guids.Length <= 0)
         {
             Debug.LogError("未找到匹配资源 : texture");
@@ -98,9 +122,9 @@ public class AssetBundleBuilder : EditorWindow
             }
         }
         AssetBundleBuild abb = new AssetBundleBuild();
-        abb.assetBundleName = "atlasab";
+        abb.assetBundleName = abName;
         abb.assetNames = paths;
-        BuildPipeline.BuildAssetBundles(atlasOutputPath, new AssetBundleBuild[] { abb }, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.StandaloneWindows64);
+        BuildPipeline.BuildAssetBundles(outputPath, new AssetBundleBuild[] { abb }, BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.StandaloneWindows64);
         AssetDatabase.Refresh();
     }
 

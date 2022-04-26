@@ -67,14 +67,13 @@ public class CreateManager : MonoBehaviour
 
     private void AddInstanceBtnHandler()
     {
-        GameObject go = GameObject.Instantiate(instanceGo);
+        AI go = Tools.CreateGameObject<AI>(AIManager.Instance.AIModel,Vector3.zero, transform);
         ++idx;
-        //AI ai = go.GetComponent<AI>();
         AI ai = go.GetComponent<AI>();
         if (ai != null)
         {
-            //ai.SetBaseInfo(idx, transform);
-            instancesDic.Add(idx, go);
+            ai.SetBaseInfo(new UserInfo());
+            instancesDic.Add(idx, go.gameObject);
         }
     }
 }

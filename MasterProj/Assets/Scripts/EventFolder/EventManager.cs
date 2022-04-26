@@ -31,7 +31,7 @@ public class EventManager
         }
     }
 
-    public static void Send(string name,EventParam param)
+    public static void Send(string name,EventParam param = null)
     {
         if (_EventDic.ContainsKey(name))
         {
@@ -45,18 +45,19 @@ public class EventManager
 
 }
 
-public class EventName
+public static class EventName
 {
+    public static string LoadAIModelCompleted = "LoadAIModelCompleted";         //完成AIModel预制体加载后发送
 }
 
 
 public class EventParam
 {
-    public System.Object obj;
+    public System.Object objParam;
 
     public EventParam(System.Object obj)
     {
-        this.obj = obj;
+        this.objParam = obj;
     }
 
 }

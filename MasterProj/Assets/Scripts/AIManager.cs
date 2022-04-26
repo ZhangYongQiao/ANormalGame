@@ -19,7 +19,7 @@ public class AIManager : MonoBehaviour
         }
     }
 
-    public AI AIModel;
+    public AI AIModel { get; private set; }
     //TODO 使用对象池
     public Transform CreatedContainer;
 
@@ -29,6 +29,36 @@ public class AIManager : MonoBehaviour
     {
         _Instance = this;
     }
+
+    private void OnEnable()
+    {
+        EventManager.AddListener(EventName.LoadAIModelCompleted, LoadAIModelCompletedHandler);
+    }
+
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener(EventName.LoadAIModelCompleted, LoadAIModelCompletedHandler);
+    }
+
+    /// <summary>
+    /// 把模板预制保存到AImanager中
+    /// </summary>
+    /// <param name="obj"></param>
+    private void LoadAIModelCompletedHandler(EventParam obj)
+    {   
+        if(obj != null && obj.objParam != null)
+        {
+            AI aI = (obj.objParam as GameObject).GetComponent<AI>();
+            if (!aI)
+            {
+                Debug.LogError("组件AI不存在该物体上...");
+                return;
+            }
+            AIModel = aI;
+        }
+    }
+
 
     //所有推送事件
     public Queue<UserInfo> MsgQueue  { get; private set; }  = new Queue<UserInfo>();
